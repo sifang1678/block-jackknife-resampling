@@ -19,24 +19,24 @@ do
 GWAS_FILE=${working_dir}/data/UKBB/GWAS_results/${PHEN_NAME}_${i}_imputed.txt.gz
 
 ## extract the RSIDs and p-values from GWAS summary statistics for clumping
-zcat ${GWAS_FILE} | awk '{print $1"\t"$2}' > ${clumping_output_dir}/tmp/${PHEN_NAME}_all_${i}_gwas_pval.txt
+zcat ${GWAS_FILE} | awk '{print $1"\t"$2}' > ${clumping_output_dir}/tmp/${PHEN_NAME}_${i}_gwas_pval.txt
 
 ## perform GWAS clumping
 plink \
     --bfile $reference_panel \
-    --clump ${clumping_output_dir}/tmp/${PHEN_NAME}_all_${i}_gwas_pval.txt \
+    --clump ${clumping_output_dir}/tmp/${PHEN_NAME}_${i}_gwas_pval.txt \
     --clump-field P_BOLT_LMM_INF \
     --clump-p1 5e-08 \
     --clump-p2 5e-08 \
     --clump-kb 1000 \
     --clump-r2 0.001 \
-    --out ${clumping_output_dir}/tmp/${PHEN_NAME}_all_${i}_gwas
+    --out ${clumping_output_dir}/tmp/${PHEN_NAME}_${i}_gwas
 
 ## extract the RSIDs of SNPs remained after clumping
-awk '{print $3}' ${clumping_output_dir}/tmp/${PHEN_NAME}_all_${i}_gwas.clumped | sed '/^\s*$/d' > ${clumping_output_dir}/tmp/${PHEN_NAME}_all_${i}_gwas.clumped.snps
+awk '{print $3}' ${clumping_output_dir}/tmp/${PHEN_NAME}_${i}_gwas.clumped | sed '/^\s*$/d' > ${clumping_output_dir}/tmp/${PHEN_NAME}_${i}_gwas.clumped.snps
 
 ## extract the clumped SNPs from the GWAS summary statistics
-zcat ${GWAS_FILE} | grep -wFf ${clumping_output_dir}/tmp/${PHEN_NAME}_all_${i}_gwas.clumped.snps > ${clumping_output_dir}/${PHEN_NAME}_all_${i}_gwas_instruments.txt
+zcat ${GWAS_FILE} | grep -wFf ${clumping_output_dir}/tmp/${PHEN_NAME}_${i}_gwas.clumped.snps > ${clumping_output_dir}/${PHEN_NAME}_${i}_gwas_instruments.txt
 
 done
 
